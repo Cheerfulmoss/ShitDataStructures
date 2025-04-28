@@ -1,5 +1,5 @@
 from typing import Any
-from abc import ABC, abstractmethod
+
 
 class ShitLL:
     def __init__(self) -> None:
@@ -68,12 +68,13 @@ class LLNode:
         return self._next
 
     def append(self, data: Any) -> "LLNode":
-        if not self._next:
-            self.set_next(LLNode(self._indices, self._index + 1, data))
-            self._next.set_prev(self)
-            return self._next
+        offset = len(self._indices) - self._index - 1
+        self = self.move(offset)
 
-        return self._next.append(data)
+        new_node = LLNode(self._indices, self._index + 1, data)
+        self.set_next(new_node)
+        self.get_next().set_prev(self)
+        return self.get_next()
 
     def insert(self, index: int, data: Any) -> "LLNode":
         self = self.move(index)
@@ -90,10 +91,8 @@ class LLNode:
         while next is not None:
             self = next
             self._index += 1
+            self._indices[self._index] = self._index
             next = self.get_next()
-
-        for i in range(index + 1, len(self._indices)):
-            self._indices[i] += 1
 
         return new_node
 
